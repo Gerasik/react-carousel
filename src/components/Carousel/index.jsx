@@ -12,11 +12,6 @@ const CarouselWrap = styled.div`
   flex-wrap: nowrap;
 `;
 
-// const CarouselWrap = styled.div`
-//   overflow: hidden;
-//   width: 100vw;
-// `;
-
 const Carousel = ({ data, height = "100vh" }) => {
   const refContainer = useRef(null);
   const [eventStart, setEventStart] = useState(undefined);
@@ -33,8 +28,7 @@ const Carousel = ({ data, height = "100vh" }) => {
     }));
     newUpdatedData.unshift(newUpdatedData.pop());
     runScript(scripts);
-    setContainerWidth(0);
-    // setContainerWidth(-refContainer.current.offsetWidth);
+    setContainerWidth(-refContainer.current.offsetWidth);
     setArr(newUpdatedData);
   }, []);
 
@@ -49,7 +43,7 @@ const Carousel = ({ data, height = "100vh" }) => {
         }, 100);
         setTimeout(() => {
           setTransition(true);
-        }, 400);
+        }, 600);
       }
       if (currentItem == arr[arr.length - 1].id) {
         setTimeout(() => {
@@ -63,7 +57,7 @@ const Carousel = ({ data, height = "100vh" }) => {
         }, 100);
         setTimeout(() => {
           setTransition(true);
-        }, 400);
+        }, 600);
       }
     }
   }, [currentItem]);
@@ -129,6 +123,7 @@ const Carousel = ({ data, height = "100vh" }) => {
         eventFunction={eventFunction}
         containerWidth={containerWidth}
         transition={transition}
+        currentItem={arr.findIndex((i) => i.id == currentItem)}
       >
         {arr.map(({ item }) => (
           <CarouselItem
