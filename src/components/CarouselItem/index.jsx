@@ -25,14 +25,9 @@ const CarouselItem = styled.div`
 //   }
 // `;
 
-export default ({ content, eventFunction }) => {
+export default ({ content }) => {
   return (
     <CarouselItem
-      onTouchStart={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        eventFunction(e);
-      }}
       dangerouslySetInnerHTML={{
         __html: content,
       }}

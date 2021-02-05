@@ -10,12 +10,21 @@ const CarouselWrap = styled.div`
   width: 100vw;
   display: flex;
   flex-wrap: nowrap;
+  position: relative;
 `;
 
-const Carousel = ({ data, height = "100vh" }) => {
+const EventContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+`;
+
+const Carousel = ({ data, height = "100vh", infinite }) => {
   const refContainer = useRef(null);
   const [eventStart, setEventStart] = useState(undefined);
-  const [containerWidth, setContainerWidth] = useState(undefined);
   const [currentItem, setCurrentItem] = useState(1);
   const [transition, setTransition] = useState(true);
   const [arr, setArr] = useState([]);
@@ -28,7 +37,6 @@ const Carousel = ({ data, height = "100vh" }) => {
     }));
     newUpdatedData.unshift(newUpdatedData.pop());
     runScript(scripts);
-    setContainerWidth(-refContainer.current.offsetWidth);
     setArr(newUpdatedData);
   }, []);
 
@@ -39,7 +47,6 @@ const Carousel = ({ data, height = "100vh" }) => {
         setTimeout(() => {
           setTransition(false);
           setArr([arr[arr.length - 1], ...arr.slice(0, -1)]);
-          setContainerWidth(-refContainer.current.offsetWidth);
         }, 100);
         setTimeout(() => {
           setTransition(true);
@@ -51,9 +58,6 @@ const Carousel = ({ data, height = "100vh" }) => {
           const newArr = arr;
           newArr.push(newArr.shift());
           setArr([...arr.slice(1), arr[0]]);
-          setContainerWidth(
-            -refContainer.current.offsetWidth * (arr.length - 2)
-          );
         }, 100);
         setTimeout(() => {
           setTransition(true);
@@ -68,7 +72,6 @@ const Carousel = ({ data, height = "100vh" }) => {
     } else {
       setCurrentItem(currentItem - 1);
     }
-    setContainerWidth(containerWidth + refContainer.current.offsetWidth);
   };
 
   const handleClickNext = () => {
@@ -77,22 +80,33 @@ const Carousel = ({ data, height = "100vh" }) => {
     } else {
       setCurrentItem(currentItem + 1);
     }
-    setContainerWidth(containerWidth - refContainer.current.offsetWidth);
   };
 
   const eventFunction = (event) => {
-    event.preventDefault();
     switch (event.type) {
       case "mousedown":
         setEventStart(event.clientX);
         break;
+      case "touchstart":
+        setEventStart(event.changedTouches[0].clientX);
+        break;
       case "mouseup":
       case "mouseleave":
       case "mouseover":
-        console.log(eventStart, event.clientX);
         if (eventStart - event.clientX < 0 && eventStart) {
           handleClickPrev();
         } else if (eventStart - event.clientX > 0 && eventStart) {
+          handleClickNext();
+        }
+        setEventStart(undefined);
+        break;
+      case "touchend":
+        if (eventStart - event.changedTouches[0].clientX < 0 && eventStart) {
+          handleClickPrev();
+        } else if (
+          eventStart - event.changedTouches[0].clientX > 0 &&
+          eventStart
+        ) {
           handleClickNext();
         }
         setEventStart(undefined);
@@ -101,37 +115,28 @@ const Carousel = ({ data, height = "100vh" }) => {
       default:
         break;
     }
-    console.log("move", event.type);
   };
 
   return (
-    <CarouselWrap
-      ref={refContainer}
-      onTouchMoveCapture={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        eventFunction(e);
-      }}
-    >
+    <CarouselWrap ref={refContainer}>
       <CarouselNavigation
         height={height}
         handleClickPrev={handleClickPrev}
         handleClickNext={handleClickNext}
       />
+      <EventContainer
+        onMouseDown={eventFunction}
+        onMouseUp={eventFunction}
+        onTouchStart={eventFunction}
+        onTouchEnd={eventFunction}
+        onTouchMove={eventFunction}
+      />
       <CarouselContainer
-        eventFunction={eventFunction}
-        containerWidth={containerWidth}
         transition={transition}
         currentItem={arr.findIndex((i) => i.id == currentItem)}
       >
         {arr.map(({ item }) => (
-          <CarouselItem
-            eventFunction={eventFunction}
-            key={item}
-            height={height}
-            content={item}
-          />
+          <CarouselItem key={item} height={height} content={item} />
         ))}
       </CarouselContainer>
     </CarouselWrap>

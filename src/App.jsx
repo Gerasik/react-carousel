@@ -6,6 +6,7 @@ const App = () => {
   return (
     <>
       {/* <Carousel data={mockData} height="400px" /> */}
+      <Carousel data={mockData} infinite={true} />
       <Carousel data={mockData} />
     </>
   );
