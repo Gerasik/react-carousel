@@ -35,6 +35,10 @@ const CarouselPrevSlide = styled(CarouselNavigationButton)`
   &::after {
     transform: translateY(-50%) rotate(45deg);
   }
+  ${({ disablePrev }) =>
+    disablePrev
+      ? "cursor: auto;&:hover{background: white}&::after {color: #eee;}"
+      : ""};
 `;
 
 const CarouselNextSlide = styled(CarouselNavigationButton)`
@@ -44,14 +48,70 @@ const CarouselNextSlide = styled(CarouselNavigationButton)`
   }
   &::after {
     transform: translateY(50%) rotate(-135deg);
+    color: ${({ disableNext }) => (disableNext ? "#eee" : "black")};
+  }
+  ${({ disablePrev }) =>
+    disablePrev
+      ? "cursor: auto;&:hover{background: white}&::after {color: #eee;}"
+      : ""};
+`;
+
+const Dots = styled.ul`
+  list-style: none;
+  z-index: 4;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80%;
+  margin: 0 10%;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+`;
+const Dot = styled.li`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin: 0 10px;
+  background: ${({ active }) => (active ? "black" : "#ddd")};
+  transition: all 0.5s;
+  &:hover {
+    background: black;
   }
 `;
 
-export default ({ handleClickPrev, handleClickNext, height }) => {
+export default ({
+  handleClickPrev,
+  handleClickNext,
+  height,
+  disablePrev,
+  disableNext,
+  setCurrentItem,
+  arr,
+  currentItem,
+}) => {
   return (
     <>
-      <CarouselPrevSlide onClick={handleClickPrev} height={height} />
-      <CarouselNextSlide onClick={handleClickNext} height={height} />
+      <CarouselPrevSlide
+        onClick={handleClickPrev}
+        height={height}
+        disablePrev={disablePrev}
+      />
+      <CarouselNextSlide
+        onClick={handleClickNext}
+        height={height}
+        disableNext={disableNext}
+      />
+      <Dots>
+        {arr.map((item) => (
+          <Dot
+            key={item.id}
+            onClick={() => setCurrentItem(item.id)}
+            active={item.id == currentItem}
+          />
+        ))}
+      </Dots>
     </>
   );
 };

@@ -15,14 +15,16 @@ const CarouselContainer = styled.div`
   position: relative;
 `;
 
-export default ({ transition, children, currentItem }) => {
+export default ({ transition, children, currentItem, multiple }) => {
   const refContainer = useRef(null);
   return (
     <CarouselContainer
       ref={refContainer}
       containerWidth={
         refContainer.current
-          ? -refContainer.current.offsetWidth * currentItem
+          ? multiple
+            ? (-refContainer.current.offsetWidth * (currentItem - 1) * 30) / 100
+            : -refContainer.current.offsetWidth * currentItem
           : 0
       }
       transition={transition}

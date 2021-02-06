@@ -11,6 +11,7 @@ const CarouselWrap = styled.div`
   display: flex;
   flex-wrap: nowrap;
   position: relative;
+  margin: 0 0 30px;
 `;
 
 const EventContainer = styled.div`
@@ -22,7 +23,7 @@ const EventContainer = styled.div`
   z-index: 1;
 `;
 
-const Carousel = ({ data, height = "100vh", infinite }) => {
+const Carousel = ({ data, height = "100vh", infinite, multiple }) => {
   const refContainer = useRef(null);
   const [eventStart, setEventStart] = useState(undefined);
   const [currentItem, setCurrentItem] = useState(1);
@@ -35,39 +36,45 @@ const Carousel = ({ data, height = "100vh", infinite }) => {
       item,
       id: id + 1,
     }));
-    newUpdatedData.unshift(newUpdatedData.pop());
-    runScript(scripts);
+    if (infinite) {
+      newUpdatedData.unshift(newUpdatedData.pop());
+    }
     setArr(newUpdatedData);
+    console.log(scripts);
+    runScript(scripts);
   }, []);
 
-  useEffect(() => {
-    setTransition(true);
-    if (arr.length) {
-      if (currentItem == arr[0].id) {
-        setTimeout(() => {
-          setTransition(false);
-          setArr([arr[arr.length - 1], ...arr.slice(0, -1)]);
-        }, 100);
-        setTimeout(() => {
-          setTransition(true);
-        }, 600);
+  if (infinite) {
+    useEffect(() => {
+      setTransition(true);
+      if (arr.length) {
+        if (currentItem == arr[0].id) {
+          setTimeout(() => {
+            setTransition(false);
+            setArr([arr[arr.length - 1], ...arr.slice(0, -1)]);
+          }, 100);
+          setTimeout(() => {
+            setTransition(true);
+          }, 600);
+        }
+        if (currentItem == arr[arr.length - 1].id) {
+          setTimeout(() => {
+            setTransition(false);
+            const newArr = arr;
+            newArr.push(newArr.shift());
+            setArr([...arr.slice(1), arr[0]]);
+          }, 100);
+          setTimeout(() => {
+            setTransition(true);
+          }, 600);
+        }
       }
-      if (currentItem == arr[arr.length - 1].id) {
-        setTimeout(() => {
-          setTransition(false);
-          const newArr = arr;
-          newArr.push(newArr.shift());
-          setArr([...arr.slice(1), arr[0]]);
-        }, 100);
-        setTimeout(() => {
-          setTransition(true);
-        }, 600);
-      }
-    }
-  }, [currentItem]);
+    }, [currentItem]);
+  }
 
   const handleClickPrev = () => {
-    if (currentItem - 1 == 0) {
+    if (currentItem == 1 && !infinite) {
+    } else if (currentItem - 1 == 0) {
       setCurrentItem(arr.length);
     } else {
       setCurrentItem(currentItem - 1);
@@ -75,7 +82,8 @@ const Carousel = ({ data, height = "100vh", infinite }) => {
   };
 
   const handleClickNext = () => {
-    if (currentItem + 1 > arr.length) {
+    if (currentItem == arr.length && !infinite) {
+    } else if (currentItem + 1 > arr.length) {
       setCurrentItem(1);
     } else {
       setCurrentItem(currentItem + 1);
@@ -121,8 +129,13 @@ const Carousel = ({ data, height = "100vh", infinite }) => {
     <CarouselWrap ref={refContainer}>
       <CarouselNavigation
         height={height}
+        disablePrev={currentItem == 1 && !infinite}
+        disableNext={currentItem == arr.length && !infinite}
         handleClickPrev={handleClickPrev}
         handleClickNext={handleClickNext}
+        setCurrentItem={setCurrentItem}
+        arr={arr}
+        currentItem={currentItem}
       />
       <EventContainer
         onMouseDown={eventFunction}
@@ -134,9 +147,15 @@ const Carousel = ({ data, height = "100vh", infinite }) => {
       <CarouselContainer
         transition={transition}
         currentItem={arr.findIndex((i) => i.id == currentItem)}
+        multiple={multiple}
       >
         {arr.map(({ item }) => (
-          <CarouselItem key={item} height={height} content={item} />
+          <CarouselItem
+            key={item}
+            height={height}
+            content={item}
+            multiple={multiple}
+          />
         ))}
       </CarouselContainer>
     </CarouselWrap>

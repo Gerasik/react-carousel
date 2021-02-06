@@ -8,6 +8,8 @@ const App = () => {
       {/* <Carousel data={mockData} height="400px" /> */}
       <Carousel data={mockData} infinite={true} />
       <Carousel data={mockData} />
+      <Carousel data={mockData} infinite={true} multiple={true} />
+      <Carousel data={mockData} multiple={true} />
     </>
   );
 };
