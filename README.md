@@ -1,6 +1,6 @@
 # React carousel component
 
-The carousel component was designed for a test problem for the necessary [details and requirements](./TASK.md).
+The carousel component was designed for a test task for the necessary [details and requirements](./TASK.md).
 An example of the component's work can be found at the [gh-pages](https://gerasik.github.io/react-carousel/).
 
 ---
